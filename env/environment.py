@@ -11,12 +11,16 @@ class TrafficEnv:
     def __init__(self, config):
 
         # Save Configuration
-        self.config = config        # config will have stuff like number of episodes, values of hyperparameters etc.
+        self.config = config
 
-        # Simulation Parameters         # this could also be merged with config ??
-        self.lane_length = config.LANE_LENGTH
-        self.max_steps = config.MAX_STEPS
-        self.min_green_time = config.MIN_GREEN_TIME
+        """
+        config currently has:
+            MAX_STEPS
+            MIN_GREEN_TIME
+            LANE_LENGTH
+            (we can also put in the lambdas of the vehicle generator here)
+            REWARD FUNCTIONS
+        """
 
         # Vehicle Generator
         self.generator = VehicleGenerator(config.LAMBDA_N, config.LAMBDA_S, config.LAMBDA_E, config.LAMBDA_W)
@@ -25,10 +29,23 @@ class TrafficEnv:
         # Start the first episode
         self.reset()
 
+
+    # FOR DEBUGGING ###############################################
+    def print_state(self):
+        print(f"Step: {self.current_step}")
+        print(f"Light: {self.light_state}")
+        print(f"Phase Duration: {self.current_phase_duration}")
+
+        print(f"N: {self.queues['N']}")
+        print(f"S: {self.queues['S']}")
+        print(f"E: {self.queues['E']}")
+        print(f"W: {self.queues['W']}")
+    # #############################################################
+
     def get_raw_state(self):
         newQueues = {}
         for direction in self.queues:
-            newQueues[direction] = self.queues[direction].copy()      # we're using a copy coz we dont want visualizer or smth to accidentally
+            newQueues[direction] = self.queues[direction].copy()      # we're using a copy coz we don't want visualizer or smth to accidentally
                                                                                 # erase the original env queues
         return {
             "queues": newQueues,
@@ -73,13 +90,16 @@ class TrafficEnv:
         self.current_phase_duration += 1
 
         # Check if episode finished
-        done = self.current_step >= self.max_steps
+        done = self.current_step >= self.config.MAX_STEPS
 
         return self.get_raw_state(), reward, done
 
-    # Apply Action
+
+    # the following function names start with _ bcoz they are internal functions & need to be called from outside
+    
+    # Apply Action             
     def _apply_action(self, action):
-        if action == Action.SWITCH and self.current_phase_duration >= self.min_green_time:
+        if action == Action.SWITCH and self.current_phase_duration >= self.config.MIN_GREEN_TIME:
             if self.light_state == "NS":
                 self.light_state = "EW"
             else:
@@ -122,11 +142,9 @@ class TrafficEnv:
 
         for direction in self.queues:
             for _ in range(newCars[direction]):
-                if len(self.queues[direction]) < self.lane_length:
+                if len(self.queues[direction]) < self.config.LANE_LENGTH:
                     self.queues[direction].append(Car(self.current_step))
 
     # Compute Reward
     def _compute_reward(self):
-        # put something here
-
-
+        return self.config.REWARD_FUNCTION(self)
