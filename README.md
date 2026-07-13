@@ -26,6 +26,7 @@ To avoid unrealistic bursts, arrivals per timestep are capped at a configurable 
 The simulator models a standard four-way intersection with two traffic phases:
 - North–South Green
 - East–West Green
+
 The environment supports two actions:
 - KEEP – continue the current green phase
 - SWITCH – change to the opposite phase
