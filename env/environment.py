@@ -7,20 +7,15 @@ class Action(Enum):
     KEEP = 0
     SWITCH = 1
 
+class Light(Enum):
+    NS = 0
+    EW = 1
+
 class TrafficEnv:
     def __init__(self, config):
 
         # Save Configuration
         self.config = config
-
-        """
-        config currently has:
-            MAX_STEPS
-            MIN_GREEN_TIME
-            LANE_LENGTH
-            (we can also put in the lambdas of the vehicle generator here)
-            REWARD FUNCTIONS
-        """
 
         # Vehicle Generator
         self.generator = VehicleGenerator(config.LAMBDA_N, config.LAMBDA_S, config.LAMBDA_E, config.LAMBDA_W)
@@ -33,7 +28,7 @@ class TrafficEnv:
     # FOR DEBUGGING ###############################################
     def print_state(self):
         print(f"Step: {self.current_step}")
-        print(f"Light: {self.light_state}")
+        print(f"Light: {self.light_state.name}")
         print(f"Phase Duration: {self.current_phase_duration}")
 
         print(f"N: {self.queues['N']}")
@@ -67,18 +62,20 @@ class TrafficEnv:
             "E": [],
             "W": []
         }
-        self.light_state = "NS"         # this can be "NS" or "EW"...showing which road is green
+        self.light_state = Light.NS         # this can be one of the 2 enums...showing which road is green
         self.current_phase_duration = 0
         self.current_step = 0
 
         # Statistics
-        self.cars_departed_last_step = 0        # not using this currently
+        self.cars_departed_last_step = 0
         self.total_cars_departed = 0
         self.total_cars_spawned = 0
         self.total_switches = 0
         self.cumulative_reward = 0
         self.total_waiting_time = 0
         self.max_queue_length_reached = 0       # not using this currently
+
+        return self.get_raw_state()
 
     def step(self, action):
         self._apply_action(action)
@@ -100,40 +97,46 @@ class TrafficEnv:
     # Apply Action             
     def _apply_action(self, action):
         if action == Action.SWITCH and self.current_phase_duration >= self.config.MIN_GREEN_TIME:
-            if self.light_state == "NS":
-                self.light_state = "EW"
+            if self.light_state == Light.NS:
+                self.light_state = Light.EW
             else:
-                self.light_state = "NS"
+                self.light_state = Light.NS
 
             self.current_phase_duration = 0
             self.total_switches += 1
 
     # Move Vehicles
     def _move_vehicles(self):
-        if self.light_state == "NS":
+        self.cars_departed_last_step = 0
+
+        if self.light_state == Light.NS:
             if self.queues["N"]:
                 car = self.queues["N"].pop(0)
                 wait = self.current_step - car.entry_time
                 self.total_cars_departed += 1
+                self.cars_departed_last_step += 1
                 self.total_waiting_time += wait
 
             if self.queues["S"]:
                 car = self.queues["S"].pop(0)
                 wait = self.current_step - car.entry_time
-                self.total_cars_departed += 1   
+                self.total_cars_departed += 1
+                self.cars_departed_last_step += 1
                 self.total_waiting_time += wait
 
         else:
             if self.queues["E"]:
                 car = self.queues["E"].pop(0)
                 wait = self.current_step - car.entry_time
-                self.total_cars_departed += 1 
+                self.total_cars_departed += 1
+                self.cars_departed_last_step += 1
                 self.total_waiting_time += wait
 
             if self.queues["W"]:
                 car = self.queues["W"].pop(0)
                 wait = self.current_step - car.entry_time
-                self.total_cars_departed += 1  
+                self.total_cars_departed += 1
+                self.cars_departed_last_step += 1
                 self.total_waiting_time += wait
 
     # Spawn New Vehicles
@@ -144,7 +147,15 @@ class TrafficEnv:
             for _ in range(newCars[direction]):
                 if len(self.queues[direction]) < self.config.LANE_LENGTH:
                     self.queues[direction].append(Car(self.current_step))
+                    self.total_cars_spawned += 1
 
     # Compute Reward
     def _compute_reward(self):
         return self.config.REWARD_FUNCTION(self)
+
+    # Prevents rapid switching
+    def get_valid_actions(self):
+        if self.current_phase_duration < self.config.MIN_GREEN_TIME:
+            return [Action.KEEP]
+
+        return [Action.KEEP, Action.SWITCH]
