@@ -87,7 +87,36 @@ Policies are evaluated using several traffic performance metrics, including:
 
 A configurable Fixed-Time Controller is included as a baseline for comparison.
 
-### Current Progress
+## Project Structure
+
+```
+Traffic-RL-Optimizer/
+│
+├── algorithms/
+│   ├── fixed_time_agent.py      # Fixed-time baseline controller
+│   └── sarsa_agent.py           # SARSA implementation
+│
+├── env/
+│   ├── car.py                   # Vehicle model
+│   ├── environment.py           # Traffic simulation environment
+│   ├── reward_functions.py      # Modular reward functions
+│   ├── state_encoder.py         # State representation for RL agents
+│   └── vehicle_generator.py     # Poisson traffic generator
+│
+├── experiments/
+│   ├── train_sarsa_agent.py         # Train SARSA agent
+│   ├── evaluate_sarsa_agent.py      # Evaluate trained SARSA policy
+│   └── evaluate_fixed_time_agent.py # Evaluate fixed-time baseline
+│
+├── q_tables/
+│   └── sarsa_q_table.pkl        # Saved SARSA Q-table
+│
+├── config.py                    # Simulation and training configuration
+├── debug.py                     # Debugging utilities
+└── README.md
+```
+
+## Current Progress
 
 ✅ Four-way traffic simulation environment
 
