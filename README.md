@@ -90,14 +90,25 @@ A configurable Fixed-Time Controller is included as a baseline for comparison.
 ### Current Progress
 
 ✅ Four-way traffic simulation environment
+
 ✅ Poisson traffic generation
+
 ✅ Queue-based vehicle model
+
 ✅ Modular reward functions
+
 ✅ SARSA implementation
+
 ✅ Fixed-time baseline controller
+
 ✅ Evaluation framework
+
 🔄 Q-Learning implementation
+
 🔄 Expected SARSA implementation
+
 🔄 Comparative performance analysis
+
 🔄 Results Plotting
+
 🔄 Visualizer
