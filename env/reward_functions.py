@@ -27,6 +27,8 @@ def queue_length_reward(env):
 
     return -total_queue_length
 
+def throughput_reward(env):
+    return env.cars_departed_last_step
 
 def composite_reward(env):
     """

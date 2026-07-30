@@ -18,8 +18,7 @@ class TrafficEnv:
         self.config = config
 
         # Vehicle Generator
-        self.generator = VehicleGenerator(config.LAMBDA_N, config.LAMBDA_S, config.LAMBDA_E, config.LAMBDA_W)
-        # max_spawn_per_step argument currently not passed
+        self.generator = VehicleGenerator(config.LAMBDA_N, config.LAMBDA_S, config.LAMBDA_E, config.LAMBDA_W, config.MAX_SPAWN_PER_STEP)
 
         # Start the first episode
         self.reset()
