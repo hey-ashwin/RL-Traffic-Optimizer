@@ -8,9 +8,10 @@ The project aims to build an RL agent capable of learning optimal traffic signal
 ## Project Goals
 - Build a realistic four-way traffic intersection simulator.
 - Support multiple reward functions for experimentation.
-- Keep the environment independent of any specific RL algorithm.
-- Train and compare algorithms such as Q-Learning and Deep Q-Networks (DQN).
+- Experiment with different reward functions and state representations.
+- Train and compare algorithms such as SARSA, Q-Learning and Deep Q-Networks (DQN).
 - Evaluate learned policies against fixed-time traffic signals.
+- Analyze the impact of state encoding and reward design on RL performance.
 
 ## Current Features
 
@@ -30,7 +31,7 @@ The simulator models a standard four-way intersection with two traffic phases:
 The environment supports two actions:
 - KEEP – continue the current green phase
 - SWITCH – change to the opposite phase
-A minimum green duration prevents unrealistic rapid switching.
+A configurable minimum green duration prevents unrealistic rapid switching.
 
 ### Queue-Based Traffic Model (env/environment.py) (env/car.py)
 Each lane stores individual vehicle objects rather than simple counts.
@@ -38,6 +39,7 @@ Every vehicle records its entry time, allowing accurate computation of:
 - Waiting time
 - Queue length
 - Vehicle throughput
+- Remaining congestion
 Vehicles move through the intersection whenever their direction receives a green signal.
 
 ### Configurable Reward Functions (env/reward_functions.py)
@@ -45,18 +47,24 @@ Reward functions are completely modular.
 Current implementations include:
 - Waiting Time Minimization
 - Queue Length Minimization
+- Throughput Reward
 - Composite Reward (throughput + queue length + waiting time)
 New reward functions can be added without modifying the environment. The desired reward is selected through config.py
 
 ### State Encoding (env/state_encoder.py)
-For tabular RL methods, raw queue lengths are converted into discrete density buckets (to avoid state-space explosion):
+~~For tabular RL methods, raw queue lengths are converted into discrete density buckets (to avoid state-space explosion):~~
 | Queue Length | State |
 | --- | --- |
 | 0 | Empty |
 | 1-3 | Low |
 | 4-7 | Medium |
 | 8-12 | High |
-| >12 | Very High |
+| >12 | Very High | 
+
+NOTE: Current experiments investigate different state representations, including:
+- Raw Queue-length counts
+- Traffic density buckets
+
 
 ### Configurable Simulation (config.py)
 Most simulation parameters are centralized in a configuration file, including:
@@ -66,4 +74,17 @@ Most simulation parameters are centralized in a configuration file, including:
 - Vehicle arrival rates
 - Reward function selection
 This allows experiments to be reproduced without modifying environment logic.
+
+### Evaluation Framework
+
+Policies are evaluated using several traffic performance metrics, including:
+- Cumulative reward
+- Average waiting time
+- Vehicle throughput
+- Vehicles departed
+- Vehicles remaining
+- Remaining cumulative waiting time
+- Number of signal switches
+
+A configurable Fixed-Time Controller is included as a baseline for comparison.
 
