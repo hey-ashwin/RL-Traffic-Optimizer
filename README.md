@@ -3,8 +3,6 @@ A modular traffic intersection simulator designed for Reinforcement Learning exp
 
 The project aims to build an RL agent capable of learning optimal traffic signal control policies. Rather than relying on hardcoded traffic-light timings, the agent will learn from interaction with a realistic simulation environment.
 
-**Current Status: Phase 1 Complete – Traffic Simulation Environment**
-
 ## Project Goals
 - Build a realistic four-way traffic intersection simulator.
 - Support multiple reward functions for experimentation.
@@ -73,6 +71,7 @@ Most simulation parameters are centralized in a configuration file, including:
 - Minimum green duration
 - Vehicle arrival rates
 - Reward function selection
+
 This allows experiments to be reproduced without modifying environment logic.
 
 ### Evaluation Framework
@@ -88,3 +87,16 @@ Policies are evaluated using several traffic performance metrics, including:
 
 A configurable Fixed-Time Controller is included as a baseline for comparison.
 
+### Current Progress
+✅ Four-way traffic simulation environment
+✅ Poisson traffic generation
+✅ Queue-based vehicle model
+✅ Modular reward functions
+✅ SARSA implementation
+✅ Fixed-time baseline controller
+✅ Evaluation framework
+🔄 Q-Learning implementation
+🔄 Expected SARSA implementation
+🔄 Comparative performance analysis
+🔄 Results Plotting
+🔄 Visualizer
