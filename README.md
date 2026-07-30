@@ -88,6 +88,7 @@ Policies are evaluated using several traffic performance metrics, including:
 A configurable Fixed-Time Controller is included as a baseline for comparison.
 
 ### Current Progress
+
 ✅ Four-way traffic simulation environment
 ✅ Poisson traffic generation
 ✅ Queue-based vehicle model
