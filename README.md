@@ -47,6 +47,7 @@ Current implementations include:
 - Queue Length Minimization
 - Throughput Reward
 - Composite Reward (throughput + queue length + waiting time)
+
 New reward functions can be added without modifying the environment. The desired reward is selected through config.py
 
 ### State Encoding (env/state_encoder.py)
